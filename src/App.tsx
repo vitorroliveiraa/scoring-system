@@ -18,7 +18,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ChevronDown, ChevronUp } from "lucide-react";
-
 interface Abastecimento {
   data: string;
   valor: number;
@@ -34,17 +33,23 @@ interface Registro {
 }
 
 const formatarMoeda = (valor: number): string => {
-  return valor.toLocaleString("'pt-BR'", {
-    style: "currency",
-    currency: "'BRL'",
-  });
+  try {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(valor);
+  } catch (error) {
+    console.error("Erro ao formatar moeda:", error);
+    return `R$ ${valor.toFixed(2)}`;
+  }
 };
 
 const parseMoeda = (valor: string): number => {
-  return Number(valor.replace(/[^\d,]/g, "").replace("','", "'.'"));
+  const numericValue = valor.replace(/[^\d,]/g, "").replace(",", ".");
+  return isNaN(parseFloat(numericValue)) ? 0 : parseFloat(numericValue);
 };
 
-export default function CadastroAbastecimentoComponent() {
+export default function CadastroAbastecimento() {
   const [registros, setRegistros] = useState<Registro[]>([]);
   const [nome, setNome] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -65,7 +70,7 @@ export default function CadastroAbastecimentoComponent() {
 
   const handleValorBlur = () => {
     if (valor) {
-      const numberValue = Number(valor) / 100;
+      const numberValue = parseMoeda(valor);
       setValor(formatarMoeda(numberValue));
     }
   };
@@ -81,9 +86,7 @@ export default function CadastroAbastecimentoComponent() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const valorNumerico = valor.includes("R$")
-      ? parseMoeda(valor)
-      : Number(valor) / 100;
+    const valorNumerico = parseMoeda(valor);
     const novoAbastecimento: Abastecimento = {
       data: new Date().toLocaleString("pt-BR"),
       valor: valorNumerico,
