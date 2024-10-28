@@ -64,8 +64,19 @@ export default function CadastroAbastecimentoComponent() {
   };
 
   const handleValorBlur = () => {
-    const numberValue = Number(valor) / 100;
-    setValor(formatarMoeda(numberValue));
+    if (valor) {
+      const numberValue = Number(valor) / 100;
+      setValor(formatarMoeda(numberValue));
+    }
+  };
+
+  const handleValorFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (valor.startsWith("R$")) {
+      const numericValue = valor.replace(/\D/g, "");
+      setValor(numericValue);
+    }
+    // Mova o cursor para o final do input
+    e.target.setSelectionRange(e.target.value.length, e.target.value.length);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -186,6 +197,7 @@ export default function CadastroAbastecimentoComponent() {
                 value={valor}
                 onChange={handleValorChange}
                 onBlur={handleValorBlur}
+                onFocus={handleValorFocus}
                 placeholder="R$ 0,00"
                 inputMode="numeric"
                 required
