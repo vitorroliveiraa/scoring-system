@@ -59,23 +59,20 @@ export default function CadastroAbastecimentoComponent() {
   };
 
   const handleValorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Armazena o valor inicial do cursor para não alterá-lo depois
-    const cursorPosition = e.target.selectionStart || 0;
+    // Permite apenas valores numéricos e vírgula
+    const rawValue = e.target.value.replace(/[^\d,]/g, "");
+    setValor(rawValue);
+  };
+  // Formata o valor como moeda ao perder o foco
+  const handleBlur = () => {
+    const valorNumerico = parseMoeda(valor);
+    setValor(formatarMoeda(valorNumerico));
+  };
 
-    // Remove caracteres não numéricos
-    const rawValue = e.target.value.replace(/[^\d]/g, "");
-
-    // Converte para número e formata como moeda
-    const numberValue = Number(rawValue) / 100;
-    const formattedValue = formatarMoeda(numberValue);
-
-    // Atualiza o valor formatado
-    setValor(formattedValue);
-
-    // Define a nova posição do cursor, evitando que ele volte ao início
-    setTimeout(() => {
-      e.target.setSelectionRange(cursorPosition, cursorPosition);
-    }, 0);
+  // Remove a formatação ao focar no campo para facilitar a edição
+  const handleFocus = () => {
+    const valorNumerico = parseMoeda(valor);
+    setValor(valorNumerico.toString());
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -193,6 +190,8 @@ export default function CadastroAbastecimentoComponent() {
                 id="valor"
                 value={valor}
                 onChange={handleValorChange}
+                onBlur={handleBlur}
+                onFocus={handleFocus}
                 placeholder="R$ 0,00"
                 required
               />
