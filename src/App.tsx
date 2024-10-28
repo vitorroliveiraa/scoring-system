@@ -59,27 +59,22 @@ export default function CadastroAbastecimentoComponent() {
   };
 
   const handleValorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Permite apenas valores numéricos e vírgula
-    const rawValue = e.target.value.replace(/[^\d,]/g, "");
+    const rawValue = e.target.value.replace(/[^\d]/g, "");
     setValor(rawValue);
   };
-  // Formata o valor como moeda ao perder o foco
-  const handleBlur = () => {
-    const valorNumerico = parseMoeda(valor);
-    setValor(formatarMoeda(valorNumerico));
-  };
 
-  // Remove a formatação ao focar no campo para facilitar a edição
-  const handleFocus = () => {
-    const valorNumerico = parseMoeda(valor);
-    setValor(valorNumerico.toString());
+  const handleValorBlur = () => {
+    const numberValue = Number(valor) / 100;
+    setValor(formatarMoeda(numberValue));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const valorNumerico = parseMoeda(valor);
+    const valorNumerico = valor.includes("R$")
+      ? parseMoeda(valor)
+      : Number(valor) / 100;
     const novoAbastecimento: Abastecimento = {
-      data: new Date().toLocaleString("'pt-BR'"),
+      data: new Date().toLocaleString("pt-BR"),
       valor: valorNumerico,
       tickets: calcularTickets(valorNumerico),
     };
@@ -190,9 +185,9 @@ export default function CadastroAbastecimentoComponent() {
                 id="valor"
                 value={valor}
                 onChange={handleValorChange}
-                onBlur={handleBlur}
-                onFocus={handleFocus}
+                onBlur={handleValorBlur}
                 placeholder="R$ 0,00"
+                inputMode="numeric"
                 required
               />
             </div>
@@ -240,7 +235,7 @@ export default function CadastroAbastecimentoComponent() {
                   {expandidos.has(index) && (
                     <TableRow>
                       <TableCell colSpan={5}>
-                        <div className="p-4 bg-zinc-100 dark:bg-zinc-800">
+                        <div className="p-4 bg-muted">
                           <h4 className="font-semibold mb-2">
                             Histórico de Abastecimentos:
                           </h4>
