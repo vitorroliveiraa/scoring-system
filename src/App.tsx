@@ -59,9 +59,23 @@ export default function CadastroAbastecimentoComponent() {
   };
 
   const handleValorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value.replace(/\D/g, "");
+    // Armazena o valor inicial do cursor para não alterá-lo depois
+    const cursorPosition = e.target.selectionStart || 0;
+
+    // Remove caracteres não numéricos
+    const rawValue = e.target.value.replace(/[^\d]/g, "");
+
+    // Converte para número e formata como moeda
     const numberValue = Number(rawValue) / 100;
-    setValor(formatarMoeda(numberValue));
+    const formattedValue = formatarMoeda(numberValue);
+
+    // Atualiza o valor formatado
+    setValor(formattedValue);
+
+    // Define a nova posição do cursor, evitando que ele volte ao início
+    setTimeout(() => {
+      e.target.setSelectionRange(cursorPosition, cursorPosition);
+    }, 0);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
