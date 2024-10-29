@@ -65,29 +65,21 @@ export default function CadastroAbastecimento() {
 
   const handleValorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/[^\d]/g, "");
-    const digits = rawValue.replace(/\D/g, "");
 
-    // Cria o novo valor formatado com a máscara
-    let formattedValue = "0,00";
-
-    if (digits.length > 0) {
-      const integerPart = digits.slice(0, -2) || "0";
-      const decimalPart = digits.slice(-2).padStart(2, "0");
-
-      const convertido = parseInt(integerPart);
-      if (convertido > 0) {
-        const milhar = integerPart.slice(0, -3);
-        const centena = integerPart.slice(-3).padStart(3, "0");
-        console.log("milhar: " + milhar + " centena:" + centena);
-        if (parseInt(milhar) > 0)
-          formattedValue = `${milhar}.${parseInt(centena)},${decimalPart}`;
-        else formattedValue = `${parseInt(integerPart)},${decimalPart}`;
-      } else {
-        formattedValue = `0,${decimalPart}`;
-      }
+    if (rawValue === "00" || rawValue === "") {
+      setValor("");
+      return;
     }
 
-    setValor(formattedValue);
+    const centavos = parseFloat(rawValue) / 100;
+
+    const formattedValue = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+    }).format(centavos);
+
+    setValor(formattedValue.replace("R$", "").trim());
   };
 
   const handleValorBlur = () => {
