@@ -65,14 +65,36 @@ export default function CadastroAbastecimento() {
 
   const handleValorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/[^\d]/g, "");
-    setValor(rawValue);
+    const digits = rawValue.replace(/\D/g, "");
+
+    // Cria o novo valor formatado com a máscara
+    let formattedValue = "0,00";
+
+    if (digits.length > 0) {
+      const integerPart = digits.slice(0, -2) || "0";
+      const decimalPart = digits.slice(-2).padStart(2, "0");
+
+      const convertido = parseInt(integerPart);
+      if (convertido > 0) {
+        const milhar = integerPart.slice(0, -3);
+        const centena = integerPart.slice(-3).padStart(3, "0");
+        console.log("milhar: " + milhar + " centena:" + centena);
+        if (parseInt(milhar) > 0)
+          formattedValue = `${milhar}.${parseInt(centena)},${decimalPart}`;
+        else formattedValue = `${parseInt(integerPart)},${decimalPart}`;
+      } else {
+        formattedValue = `0,${decimalPart}`;
+      }
+    }
+
+    setValor(formattedValue);
   };
 
   const handleValorBlur = () => {
-    if (valor) {
-      const numberValue = parseMoeda(valor);
-      setValor(formatarMoeda(numberValue));
-    }
+    // if (valor) {
+    //   const numberValue = parseMoeda(valor);
+    //   setValor(formatarMoeda(numberValue));
+    // }
   };
 
   const handleValorFocus = (e: React.FocusEvent<HTMLInputElement>) => {
